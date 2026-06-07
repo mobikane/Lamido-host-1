@@ -1,0 +1,81 @@
+# Lamido Host - Platform Configuration
+# Configure which hosting platforms are enabled and their credentials
+
+platforms:
+  # GitHub Pages - Perfect for static sites
+  github_pages:
+    enabled: true
+    type: static
+    description: "GitHub Pages for static websites"
+    settings:
+      repository: ""  # Will auto-detect from GitHub context
+      branch: gh-pages
+      cname: ""  # Optional: custom domain
+
+  # Vercel - Serverless platform (Node.js, Static, Python)
+  vercel:
+    enabled: false
+    type: dynamic
+    description: "Vercel serverless platform"
+    settings:
+      token: ${{ secrets.VERCEL_TOKEN }}
+      project_name: ""
+      team: ""
+      production: true
+
+  # Netlify - Full-stack platform
+  netlify:
+    enabled: false
+    type: dynamic
+    description: "Netlify platform with build and deploy"
+    settings:
+      token: ${{ secrets.NETLIFY_TOKEN }}
+      site_id: ""
+      production_branch: main
+
+  # AWS - Flexible cloud hosting
+  aws:
+    enabled: false
+    type: dynamic
+    description: "AWS EC2, S3, or Elastic Beanstalk"
+    settings:
+      service: s3  # Options: s3, ec2, elasticbeanstalk
+      access_key: ${{ secrets.AWS_ACCESS_KEY }}
+      secret_key: ${{ secrets.AWS_SECRET_KEY }}
+      region: us-east-1
+      bucket: ""  # For S3
+      instance_id: ""  # For EC2
+      environment: ""  # For Elastic Beanstalk
+
+  # Self-Hosted - Your own server
+  self_hosted:
+    enabled: false
+    type: dynamic
+    description: "Deploy to your own server via SSH"
+    settings:
+      ssh_host: ""
+      ssh_user: ""
+      ssh_port: 22
+      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+      deploy_path: /var/www/html
+      restart_command: "systemctl restart nginx"  # Optional
+
+# Global deployment settings
+deployment:
+  timeout: 300  # seconds - timeout for deployment
+  retry_on_failure: true
+  max_retries: 3
+  retry_delay: 30  # seconds
+
+# Notification settings
+notifications:
+  slack:
+    enabled: false
+    webhook: ${{ secrets.SLACK_WEBHOOK }}
+  
+  email:
+    enabled: false
+    recipients: []
+    
+  github:
+    enabled: true  # GitHub Actions notifications

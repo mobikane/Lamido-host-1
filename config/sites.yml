@@ -1,0 +1,65 @@
+# Lamido Host - Sites Configuration
+# Define all your websites here (can also use .lamido-config.yml per site)
+
+sites:
+  # Example static site
+  example_static:
+    name: example-static
+    path: websites/example-static
+    type: static
+    enabled: true
+    
+    build:
+      enabled: false  # Static site, no build needed
+    
+    deploy:
+      platform: github_pages
+      branch: gh-pages
+    
+    health_check:
+      enabled: true
+      interval: 300
+      endpoints:
+        - https://mobikane.github.io/Lamido-host-1/example-static
+      timeout: 10
+    
+    auto_recovery:
+      enabled: true
+      retry_count: 3
+      retry_delay: 60
+
+  # Example Node.js site
+  example_node:
+    name: example-node
+    path: websites/example-node
+    type: node
+    enabled: false
+    
+    build:
+      enabled: true
+      command: npm ci && npm run build
+      output_dir: dist
+    
+    deploy:
+      platform: vercel
+    
+    health_check:
+      enabled: true
+      interval: 300
+      endpoints:
+        - https://example-node.vercel.app
+        - https://example-node.vercel.app/api/health
+      timeout: 10
+    
+    auto_recovery:
+      enabled: true
+      retry_count: 3
+      retry_delay: 60
+
+  # Add your sites below following the same structure
+  # my_portfolio:
+  #   name: my-portfolio
+  #   path: websites/my-portfolio
+  #   type: static
+  #   enabled: true
+  #   ...

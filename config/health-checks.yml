@@ -1,0 +1,97 @@
+# Lamido Host - Health Check Configuration
+# Configure how sites are monitored for health and availability
+
+health_check:
+  # Global health check settings
+  global:
+    enabled: true
+    schedule: "*/15 * * * *"  # Every 15 minutes (cron format)
+    timeout: 30  # seconds
+    retry_on_failure: true
+    max_retries: 2
+
+  # Endpoint checks - verify sites are responding
+  endpoint_checks:
+    enabled: true
+    method: GET
+    expected_status: [200, 301, 302]  # Acceptable status codes
+    follow_redirects: true
+    verify_ssl: true
+    headers:
+      User-Agent: "Lamido-Host-Health-Check/1.0"
+
+  # Performance checks - ensure sites load quickly
+  performance:
+    enabled: true
+    max_response_time: 5000  # milliseconds
+    warn_threshold: 3000  # milliseconds
+    alert_threshold: 5000  # milliseconds
+
+  # Content checks - verify content hasn't changed unexpectedly
+  content_checks:
+    enabled: false
+    check_for_patterns: []  # Add regex patterns to check for
+    # Example:
+    # - pattern: "Welcome to"
+    #   endpoint: https://mysite.com
+
+  # SSL certificate checks - alert if certificate expires soon
+  ssl_checks:
+    enabled: true
+    warn_days_before_expiry: 30
+    alert_days_before_expiry: 7
+
+  # Uptime tracking
+  uptime_tracking:
+    enabled: true
+    calculate_daily: true
+    calculate_monthly: true
+    alert_on_downtime: true
+    downtime_threshold: 3  # consecutive failures to trigger alert
+
+# Alert rules
+alerts:
+  # When to trigger alerts
+  triggers:
+    endpoint_down: true
+    slow_response: true
+    ssl_expiry: true
+    repeated_failures: true
+
+  # Notification channels
+  channels:
+    github_issues:
+      enabled: true
+      create_issue_on_downtime: true
+      auto_close_on_recovery: true
+      label: "deployment-alert"
+    
+    github_discussions:
+      enabled: false
+      discussion_category: "Health Checks"
+    
+    slack:
+      enabled: false
+      webhook: ${{ secrets.SLACK_WEBHOOK }}
+      channel: "#deployments"
+      mention_on_alert: true
+    
+    email:
+      enabled: false
+      recipients: []
+      send_daily_report: false
+    
+    github_actions_annotations:
+      enabled: true  # Always enabled - shows in Actions UI
+
+  # Recovery notifications
+  recovery:
+    notify_on_recovery: true
+    close_related_issues: true
+    post_recovery_check_delay: 60  # seconds - wait before closing issue
+
+# Custom check scripts
+custom_checks:
+  enabled: false
+  scripts_dir: scripts/health-checks
+  # Add custom health check scripts here
